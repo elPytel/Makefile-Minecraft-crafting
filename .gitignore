@@ -1,0 +1,12 @@
+# 1. Ignoruj úplně všechno
+*
+
+# 2. Povol výjimky (soubory, které chceme sledovat)
+!Makefile
+!README.md
+!.gitignore
+
+#!docs/
+#!docs/**
+
+#!*.sh
