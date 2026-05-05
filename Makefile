@@ -1,7 +1,7 @@
 # Makefile for Minecraft crafting recipes
 # simulate crafting with make and linux commands
 
-KEEP_FILES = Makefile README.md .gitignore
+KEEP_FILES = Makefile README.md .gitignore LICENSE
 
 RED	   := $(shell printf '\033[0;31m')
 GREEN  := $(shell printf '\033[0;32m')
@@ -19,6 +19,7 @@ PICKAXES = diamond_pickaxe iron_pickaxe stone_pickaxe wooden_pickaxe
 SHOVELS  = diamond_shovel iron_shovel stone_shovel wooden_shovel
 AXES     = diamond_axe iron_axe stone_axe wooden_axe
 SWORDS   = diamond_sword iron_sword stone_sword wooden_sword
+HOES     = diamond_hoe iron_hoe stone_hoe wooden_hoe
 
 ARMOR = diamond_helmet iron_helmet leather_helmet \
         diamond_chestplate iron_chestplate leather_chestplate \
@@ -34,6 +35,7 @@ PICKAXE = $(firstword $(wildcard diamond_pickaxe iron_pickaxe stone_pickaxe wood
 SHOVEL = $(firstword $(wildcard diamond_shovel iron_shovel stone_shovel wooden_shovel))
 AXE = $(firstword $(wildcard diamond_axe iron_axe stone_axe wooden_axe))
 SWORD = $(firstword $(wildcard diamond_sword iron_sword stone_sword wooden_sword))
+HOE = $(firstword $(wildcard diamond_hoe iron_hoe stone_hoe wooden_hoe))
 
 # Armor
 HELMET = $(firstword $(wildcard diamond_helmet iron_helmet leather_helmet))
@@ -45,7 +47,7 @@ all: neather_portal
 
 # --- AKCE ---
 
-visit_nether: neather_portal $(DIAMOND_SET)
+visit_nether: neather_portal $(DIAMOND_SET) baked_potato enchanted_book
 	@echo "Equipping full $(BLUE)diamond armor$(RESET) for maximum safety..."
 	@echo "$(MAGENTA)Visiting$(RESET) the Nether..."
 	@touch $@
@@ -56,20 +58,91 @@ visit_cave: $(LEATHER_SET)
 	@touch $@
 
 visit_forest: 
-	@echo "$(MAGENTA)Visiting$(RESET) the forest to gather wood and food..."
+	@echo "$(MAGENTA)Visiting$(RESET) the forest..."
 	@touch $@
+
+visit_meadow:
+	@echo "$(MAGENTA)Visiting$(RESET) the meadow..."
+	@touch $@
+
+visit_river:
+	@echo "$(MAGENTA)Visiting$(RESET) the river..."
+	@touch $@
+
+go_out_in_the_night: iron_sword $(IRON_SET) bread bed
+	@echo "Equipping full $(BLUE)iron armor$(RESET) and an $(BLUE)iron sword$(RESET) for safety..."
+	@echo "Waiting for night"
+	@echo "Going out at night to find mobs..."
+	@touch $@
+
 
 # --- BUILDING ---
 
-house: oak_planks cobblestone crafting_table furnace item_frame painting bed
-	@echo "Building a house and placing a crafting table and furnace..."
+base: house farm
+	@echo "$(GREEN)Building$(RESET) a base with a house and a farm..."
 	@touch $@
 
-neather_portal: obsidian flint_and_steel house
-	@echo "Building Nether Portal with obsidian and flint and steel..."
+neather_portal: obsidian flint_and_steel castle iron_pickaxe bread
+	@echo "$(GREEN)Building$(RESET) Nether Portal with obsidian and flint and steel..."
+	@touch $@
+
+house: oak_planks cobblestone crafting_table furnace item_frame bed glass oak_door chest
+	@echo "$(GREEN)Building$(RESET) a house and placing a crafting table and furnace..."
+	@touch $@
+
+castle: stone_bricks oak_planks crafting_table furnace item_frame painting bed glass iron_door chest | base
+	@echo "$(GREEN)Building$(RESET) a castle with stone bricks and oak planks..."
+	@touch $@
+
+farm: seeds wooden_hoe bucket_of_water oak_fence oak_fence_gate
+	@echo "$(GREEN)Setting up$(RESET) a farm with seeds using $(HOE)..."
+	@touch $@
+
+# --- COOKING ---
+
+bread: wheat
+	@echo "$(YELLOW)Crafting$(RESET) bread from wheat..."
+	@touch $@
+
+baked_potato: potato coal | furnace 
+	@echo "Baking potato in the furnace..."
+	@touch $@
+
+cooked_beef: beef coal | furnace
+	@echo "Cooking beef in the furnace..."
+	@touch $@
+
+cooked_cod: cod coal | furnace
+	@echo "Cooking cod in the furnace..."
+	@touch $@
+
+# --- FARMING ---
+
+cod: oak_boat fishing_rod | visit_river
+	@echo "Fishing for cod in the river..."
+	@touch $@
+
+potato: visit_meadow
+	@echo "Harvesting potatoes from the meadow..."
+	@touch $@
+
+wheat: seeds wooden_hoe farm
+	@echo "Farming wheat with $(HOE) on the farm..."
+	@touch $@
+
+seeds: wooden_hoe | visit_meadow
+	@echo "Farming seeds with $(HOE) in the meadow..."
+	@touch $@
+
+bucket_of_water: bucket | visit_river
+	@echo "Filling bucket with water from the river..."
 	@touch $@
 
 # --- TĚŽBA ---
+
+sand: wooden_shovel | visit_river
+	@echo "$(CYAN)Mining$(RESET) sand with $(SHOVEL)..."
+	@touch $@
 
 obsidian: diamond_pickaxe | visit_cave
 	@echo "$(CYAN)Mining$(RESET) obsidian with $(PICKAXE)..."
@@ -92,6 +165,10 @@ gravel: wooden_shovel
 	@echo "$(CYAN)Mining$(RESET) gravel with $(SHOVEL)..."
 	@touch $@
 
+flint: gravel stone_shovel
+	@echo "Mining flint from gravel..."
+	@touch $@
+
 # Dynamicky vytvoříme rudy, aby bylo co tavit
 iron_ore gold_ore copper_ore: stone_pickaxe
 	@echo "$(CYAN)Mining$(RESET) $@ with $(PICKAXE)..."
@@ -106,6 +183,15 @@ iron_ore gold_ore copper_ore: stone_pickaxe
 	@touch $@
 
 # --- NÁSTROJE ---
+
+oak_boat: oak_planks | crafting_table
+	@echo "$(YELLOW)Crafting$(RESET) oak boat from oak planks..."
+	@touch $@
+
+fishing_rod: stick string | crafting_table
+	@echo "$(YELLOW)Crafting$(RESET) fishing rod from stick and string..."
+	@touch $@
+
 # --- SPECIFICKÉ PATTERN PRAVIDLA PRO NÁSTROJE ---
 
 # Nástroje vyžadují: materiál + tyčky + stůl
@@ -123,6 +209,10 @@ iron_ore gold_ore copper_ore: stone_pickaxe
 
 %_sword: %_material stick crafting_table
 	@echo "$(YELLOW)Crafting$(RESET) sword $@ from $<..."
+	@touch $@
+
+%_hoe: %_material stick crafting_table
+	@echo "$(YELLOW)Crafting$(RESET) hoe $@ from $<..."
 	@touch $@
 
 # --- PATTERN PRAVIDLA PRO ZBROJ ---
@@ -160,12 +250,48 @@ leather_material: leather
 
 # --- KONKRÉTNÍ RECEPTY ---
 
+stone_bricks: stone | crafting_table
+	@echo "$(YELLOW)Crafting$(RESET) stone bricks from stone..."
+	@touch $@
+
+stone: cobblestone coal | furnace 
+	@echo "Smelting cobblestone in the furnace to create stone..."
+	@touch $@
+
+iron_door: iron_ingot | crafting_table
+	@echo "$(YELLOW)Crafting$(RESET) iron door from iron ingots..."
+	@touch $@
+
+string: go_out_in_the_night | visit_forest
+	@echo "Collecting string from spiders in the forest..."
+	@touch $@
+
+glass: sand furnace coal
+	@echo "Smelting sand in the furnace to create glass..."
+	@touch $@
+
+bucket: iron_ingot
+	@echo "$(YELLOW)Crafting$(RESET) bucket from iron ingots..."
+	@touch $@
+
 flint_and_steel: iron_ingot flint
 	@echo "$(YELLOW)Crafting$(RESET) flint and steel"
 	@touch $@
 
-flint: gravel stone_shovel
-	@echo "Mining flint from gravel..."
+chest: oak_planks
+	@echo "$(YELLOW)Crafting$(RESET) chest from oak planks..."
+	@touch $@
+
+oak_fence: oak_planks stick | crafting_table
+	@echo "$(YELLOW)Crafting$(RESET) oak fence from oak planks and sticks..."
+	@touch $@
+
+oak_fence_gate: oak_planks stick | crafting_table
+	@echo "$(YELLOW)Crafting$(RESET) oak fence gate from oak planks and sticks..."
+	@touch $@
+
+oak_door: oak_planks | crafting_table
+	@echo "$(YELLOW)Crafting$(RESET) oak door from oak planks..."
 	@touch $@
 
 enchanted_book: book enchanting_table
@@ -182,9 +308,18 @@ bed: wool oak_planks
 
 book: paper leather
 	@echo "$(YELLOW)Crafting$(RESET) book from paper and leather..."
-	@touch $@"
+	@touch $@
 
-leather: wooden_sword | visit_forest
+kill_cow: wooden_sword
+	@touch beef
+	@touch leather
+	@touch $@
+
+beef: kill_cow | visit_forest
+	@echo "Obtaining beef from cows..."
+	@touch $@
+
+leather: kill_cow | visit_forest
 	@echo "Obtaining leather from cows..."
 	@touch $@
 
@@ -196,11 +331,11 @@ shears: iron_ingot
 	@echo "$(YELLOW)Crafting$(RESET) shears from iron ingot..."
 	@touch $@
 
-paper: sugar_cane
+paper: sugar_cane 
 	@echo "$(YELLOW)Crafting$(RESET) paper from sugar cane..."
 	@touch $@
 
-sugar_cane:
+sugar_cane: | visit_river
 	@echo "Harvesting sugar cane..."
 	@touch $@
 
@@ -208,11 +343,11 @@ item_frame: leather stick
 	@echo "$(YELLOW)Crafting$(RESET) item frame..."
 	@touch $@
 
-painting: wool stick
+painting: wool stick | crafting_table
 	@echo "$(YELLOW)Crafting$(RESET) painting..."
 	@touch $@
 
-furnace: cobblestone crafting_table
+furnace: cobblestone | crafting_table
 	@echo "$(YELLOW)Crafting$(RESET) furnace..."
 	@touch $@
 

@@ -23,21 +23,19 @@ Available actions:
 ```
 
 Automatické proměnné:
-- $@: Cíl (např. iron_ingot).
-- $<: První závislost (např. iron_ore). To je užitečné, protože v peci tavíš rudu, ne uhlí nebo pec samotnou.
+- `$@`: Cíl (např. iron_ingot).
+- `$<`: První závislost (např. iron_ore). To je užitečné, protože v peci tavíme rudu, ne uhlí nebo pec samotnou.
 
 ## Co jsou Order-only prerekvizity?
 Standardní prerekvizita (nalevo od |) dělá dvě věci:
 
-Vynucuje pořadí: Prerekvizita se musí sestavit dříve než cíl.
-
-Vynucuje obnovu: Pokud je prerekvizita novější než cíl, cíl se musí přebudovat.
+- Vynucuje pořadí: Prerekvizita se musí sestavit dříve než cíl.
+- Vynucuje obnovu: Pokud je prerekvizita novější než cíl, cíl se musí přebudovat.
 
 Order-only prerekvizita (napravo od |) dělá jen tu první věc:
 
-Vynucuje pořadí: Musí se sestavit/existovat dříve než cíl.
-
-IGNORUJE obnovu: I když je tato prerekvizita novější než cíl, make kvůli tomu cíl znovu nepouští.
+- Vynucuje pořadí: Musí se sestavit/existovat dříve než cíl.
+- IGNORUJE obnovu: I když je tato prerekvizita novější než cíl, make kvůli tomu cíl znovu nepouští.
 
 
 ## Clean
@@ -49,10 +47,10 @@ clean:
 ```
 
 Vysvětlení:
-- -maxdepth 1: Operuje pouze v aktuálním adresáři.
-- -type f: Hledá pouze soubory.
-- ! -name: Operátor negace (vynechej vše, co se jmenuje takto).
-- -delete: Přímo smaže nalezené soubory (efektivnější než xargs).
+- `-maxdepth 1`: Operuje pouze v aktuálním adresáři.
+- `-type f`: Hledá pouze soubory.
+- `! -name`: Operátor negace (vynechej vše, co se jmenuje takto).
+- `-delete`: Přímo smaže nalezené soubory (efektivnější než xargs).
 
 ## Zdroje:
 - [Minecraft Craftings](https://minecraft-craftings.com/)
